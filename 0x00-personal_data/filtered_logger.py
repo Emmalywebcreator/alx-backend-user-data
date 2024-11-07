@@ -37,3 +37,24 @@ class RedactingFormatter(logging.Formatter):
         """Formats the log record be redaction specified fields"""
         message = super().format(record)
         return filter_datum(self.fields, self.REDACTION, message, self.SEPERATOR)
+
+
+import logging
+from typing import List
+
+
+PII_FIELDS = ("name", "email", "phone", "ssn", "password")
+
+def get_logger() -> logging.Logger:
+    """Creates a logger to handle user data with sensitive information redacted."""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    Set up StreamHandler with RedactingFormatter
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
+    logger.addHandler(stream_handler)
+
+    return logger
+
