@@ -74,3 +74,32 @@ def get_db() ->  connection.MySQLConnection:
             host=host,
             database=database
         )
+
+
+def main():
+    """Main function to retrieve and filter user data from the database"""
+    logger = get_logger()
+
+    """Retrieve database connection"""
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+
+    """Fetch all rows from the users table"""
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+
+    """Log each row with filtered data"""
+    for user in users:
+        """Create a log-friendly message with sensitive data redacted"""
+        message = f"name={user['name']}; email={user['email']}; phone={user['phone']}; " \
+                  f"ssn={user['ssn']}; password={user['password']}; ip={user['ip']}; " \
+                  f"last_login={user['last_login']}; user_agent={user['user_agent']}"
+        logger.info(message)
+
+    """Close database connection"""
+    cursor.close()
+    db.close()
+
+
+if __name__ == "__main__":
+    main()
