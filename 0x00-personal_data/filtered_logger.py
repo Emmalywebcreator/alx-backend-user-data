@@ -3,8 +3,11 @@
 A function that returns the log message obfuscated
 """
 
-import re
 import logging
+import mysql.connector
+from mysql.connector import connection
+import os
+import re
 from typing import List
 
 
@@ -54,3 +57,20 @@ def get_logger() -> logging.Logger:
 
     return logger
 
+
+def get_db() ->  connection.MySQLConnection:
+    """
+    Connect to the secure Holberton database using environment variables for
+    for credentials.
+    """
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA__DB_HOST", "localhost")
+    database = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    return mysql.connector.connect(
+            user=username,
+            password=password,
+            host=host,
+            database=database
+        )
