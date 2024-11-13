@@ -34,4 +34,3 @@ def unauthorized_endpoint():
     This endpoint raises a 401 Unauthorized error
     """
     abort(401)
-
