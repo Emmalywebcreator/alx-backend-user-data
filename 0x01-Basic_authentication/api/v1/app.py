@@ -14,6 +14,12 @@ app.register_blueprint(app_views, url_prefix="/api/v1")
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 
+auth = None
+if getenv("AUTH_TYPE") == "auth":
+    frome api.v1.auth.auth import Auth
+    auth = Auth()
+
+
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler
@@ -33,6 +39,26 @@ def forbidden_error(error):
     """ Custom error handler for forbidden access (403) """
     response = jsonify({"error": "Forbidden"}), 403
     return response
+
+
+@app.before_request
+def before_request():
+    """Filtering f each request to secure the API"""
+    if auth is None:
+        return
+
+    ecluded_path = [
+            '/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/'
+    ]
+
+    if not auth.require_auth(request.path, excluded_paths):
+        return
+
+    if auth.authorization_header(request) is none:
+        abort(401)
+
+    in auth.current_user(request) is None:
+        abort(403)
 
 
 if __name__ == "__main__":

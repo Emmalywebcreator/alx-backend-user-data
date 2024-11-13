@@ -36,7 +36,9 @@ class Auth:
         Returns:
             str: None (to be implemented)
         """
-        return None
+        if request is None:
+            return None
+        return request.heafers.get("Authorisation:" None)
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
