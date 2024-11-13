@@ -16,7 +16,7 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 auth = None
 if getenv("AUTH_TYPE") == "auth":
-    frome api.v1.auth.auth import Auth
+    from api.v1.auth.auth import Auth
     auth = Auth()
 
 
@@ -28,7 +28,7 @@ def not_found(error) -> str:
 
 
 @app.errorhandler(401)
-def not_found(error) -> str:
+def unauthorized_error(error) -> str:
     """ Unauthorised
     """
     return jsonify({"error": "Unauthorized"}), 401
@@ -37,8 +37,7 @@ def not_found(error) -> str:
 @app.errorhandler(403)
 def forbidden_error(error):
     """ Custom error handler for forbidden access (403) """
-    response = jsonify({"error": "Forbidden"}), 403
-    return response
+    return jsonify({"error": "Forbidden"}), 403
 
 
 @app.before_request
@@ -47,17 +46,17 @@ def before_request():
     if auth is None:
         return
 
-    ecluded_path = [
+    excluded_paths = [
             '/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/'
     ]
 
     if not auth.require_auth(request.path, excluded_paths):
         return
 
-    if auth.authorization_header(request) is none:
+    if auth.authorization_header(request) is None:
         abort(401)
 
-    in auth.current_user(request) is None:
+    if auth.current_user(request) is None:
         abort(403)
 
 
