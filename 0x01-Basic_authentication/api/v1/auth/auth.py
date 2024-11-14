@@ -32,7 +32,7 @@ class Auth:
             if excluded_path.endswith('*'):
                 if path.startswith(excluded_path[:-1]):
                     return False
-           elif excluded_path == path:
+            elif excluded_path == path:
                 return False
         return True
 
