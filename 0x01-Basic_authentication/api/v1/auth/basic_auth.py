@@ -74,6 +74,7 @@ class BasicAuth(Auth):
 
         """Search for user by email in database"""
         users = User.search({"email": user_email})
+        print("Search result for users:", users)
         if not users:
             return None
 
@@ -82,4 +83,43 @@ class BasicAuth(Auth):
         if not user.is_valid_password(user_pwd):
             return None
 
+        return user
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """
+        This method retrieves the user credentials from the
+        authorization header, decodes them, and validates the
+        user by checking the credentials against the user database.
+        """
+
+        """Retrieves Authorization header"""
+        authorization_header = self.authorization_header(request)
+        if authorization_header is None:
+            return None
+
+        """Extracts Base64 portion from header"""
+        base64_credentials = self.extract_base64_authorization_header(
+                authorization_header
+            )
+        if base64_credentials is None:
+            return None
+
+        """Decode Base64 credentials"""
+        decoded_credentials = self.decode_base64_authorization_header(
+                base64_credentials
+            )
+        if decoded_credentials is None:
+            return None
+
+        """Extract user email and password"""
+        user_email, user_password = self.extract_user_credentials(
+                decoded_credentials
+            )
+        if user_email is None or user_password is None:
+            return None
+
+        """Fetchs and validate the User object"""
+        user = self.user_object_from_credentials(
+                user_email, user_password
+            )
         return user
