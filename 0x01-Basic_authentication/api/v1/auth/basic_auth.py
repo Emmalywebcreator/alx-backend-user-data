@@ -74,7 +74,6 @@ class BasicAuth(Auth):
 
         """Search for user by email in database"""
         users = User.search({"email": user_email})
-        print("Search result for users:", users)
         if not users:
             return None
 
